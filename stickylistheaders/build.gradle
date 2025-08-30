@@ -59,7 +59,7 @@ publishing {
         release(MavenPublication) {
             groupId 'com.github.jonazeiselt'
             artifactId 'stickylistheaders'
-            version '1.0.0'
+            version '1.0.1'
             from components.findByName('release')
             artifact tasks.named('sourcesJar')
             artifact tasks.named('javadocJar')
