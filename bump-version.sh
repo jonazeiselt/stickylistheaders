@@ -17,20 +17,14 @@ bumpPatch() {
 bumpVersion() {
     local index=$1
     # shellcheck disable=SC2155
-    local versionCode=$(grep "versionCode" $buildGradle | awk '{print $2}')
-    # shellcheck disable=SC2155
-    local versionName=$(grep "versionName" $buildGradle | awk -F '"' '{print $2}')
-    # shellcheck disable=SC2155
     local publishingVersion=$(grep "version '" $buildGradle | tr -d "'" | awk '{print $2}')
 
-    echo ">> Version code: $versionCode"
-    echo ">> Version name: $versionName"
     echo ">> Publishing version: $publishingVersion"
 
-    IFS='.' read -ra semanticVersioning <<< "$versionName"
+    IFS='.' read -ra semanticVersioning <<< "$publishingVersion"
 
     if [[ ${#semanticVersioning[@]} != 3 ]]; then
-        echo "Could not parse version name ($versionName)"
+        echo "Could not parse version name ($publishingVersion)"
         exit 1
     fi
 
@@ -45,14 +39,10 @@ bumpVersion() {
         semanticVersioning[2]=0
     fi
 
-    local newVersionCode=$((versionCode + 1))
     local newVersionName="${semanticVersioning[0]}.${semanticVersioning[1]}.${semanticVersioning[2]}"
 
-    echo ">> New version code: $newVersionCode"
     echo ">> New version name: $newVersionName"
 
-    sed -i '' "s/versionCode $versionCode/versionCode $newVersionCode/" $buildGradle
-    sed -i '' "s/versionName \"$versionName\"/versionName \"$newVersionName\"/" $buildGradle
     sed -i '' "s/version '$publishingVersion'/version '$newVersionName'/" $buildGradle
 
     echo ">> Updated gradle file.."
